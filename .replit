@@ -1,0 +1,7 @@
+modules = ["dart-3.8"]
+[nix]
+channel = "stable-25_05"
+packages = ["flutter"]
+
+[agent]
+expertMode = true

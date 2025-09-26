@@ -188,7 +188,7 @@ class SupabaseService {
             if (address != null) 'address': address,
             // Remove client-side timestamp, let DB handle it
           })
-          .eq('user_id', user.id) // Use authenticated user ID
+          .eq('id', user.id) // Use authenticated user ID
           .select()
           .single();
       
@@ -210,7 +210,7 @@ class SupabaseService {
       final response = await _client
           .from('profiles')
           .select()
-          .eq('user_id', user.id) // Use authenticated user ID
+          .eq('id', user.id) // Use authenticated user ID
           .single();
       
       return response;
@@ -235,7 +235,7 @@ class SupabaseService {
       final response = await _client
           .from('profiles')
           .upsert({
-            'user_id': user.id,
+            'id': user.id,
             'email': user.email,
             if (fullName != null) 'full_name': fullName,
             if (phoneNumber != null) 'phone_number': phoneNumber,

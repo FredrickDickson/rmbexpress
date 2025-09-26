@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_animate/flutter_animate.dart';
 import 'package:go_router/go_router.dart';
 import '../../core/providers/user_provider.dart';
 import '../../core/providers/transaction_provider.dart';
@@ -59,10 +58,6 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
               ),
             ),
           ],
-        ).animate().fadeIn(duration: 600.ms).slideX(
-          begin: -0.3,
-          duration: 600.ms,
-          curve: Curves.easeOutCubic,
         ),
         actions: [
           IconButton(
@@ -72,26 +67,24 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                 const SnackBar(content: Text('Notifications - Coming Soon!')),
               );
             },
-          ).animate().fadeIn(delay: 200.ms).scale(
-            duration: 400.ms,
-            curve: Curves.elasticOut,
           ),
-          
           IconButton(
-            icon: const Icon(Icons.person_outline),
+            icon: const Icon(Icons.person_outlined),
             onPressed: () => context.push(AppRouter.profile),
-          ).animate().fadeIn(delay: 400.ms).scale(
-            duration: 400.ms,
-            curve: Curves.elasticOut,
           ),
         ],
       ),
       
       body: RefreshIndicator(
-        onRefresh: _handleRefresh,
+        onRefresh: () async {
+          setState(() => _isLoading = true);
+          await _simulateLoading();
+          // Refresh transactions - provider will automatically update
+        },
         child: SingleChildScrollView(
           physics: const AlwaysScrollableScrollPhysics(),
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const SizedBox(height: 16),
               
@@ -100,7 +93,6 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                 padding: const EdgeInsets.symmetric(horizontal: 24),
                 child: BalanceCard(
                   balance: user.balance,
-                  currency: user.currency,
                   isLoading: _isLoading,
                 ),
               ),
@@ -115,7 +107,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
               // Recent Transactions
               RecentTransactions(
                 transactions: transactions,
-                isLoading: _isLoading || isLoadingTransactions,
+                isLoading: isLoadingTransactions,
               ),
               
               const SizedBox(height: 24),
@@ -124,37 +116,10 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
         ),
       ),
       
-      // Floating Action Button for main action
-      floatingActionButton: FloatingActionButton.extended(
+      floatingActionButton: FloatingActionButton(
         onPressed: () => context.push(AppRouter.buyRmb),
-        icon: const Icon(Icons.currency_exchange),
-        label: const Text('Buy RMB'),
-        backgroundColor: Theme.of(context).colorScheme.primary,
-        foregroundColor: Colors.white,
-      ).animate().fadeIn(delay: 1600.ms).scale(
-        duration: 600.ms,
-        curve: Curves.elasticOut,
+        child: const Icon(Icons.currency_exchange),
       ),
     );
-  }
-
-  Future<void> _handleRefresh() async {
-    setState(() => _isLoading = true);
-    ref.read(isLoadingTransactionsProvider.notifier).state = true;
-    
-    // Simulate refresh delay
-    await Future.delayed(const Duration(seconds: 1));
-    
-    setState(() => _isLoading = false);
-    ref.read(isLoadingTransactionsProvider.notifier).state = false;
-    
-    if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: const Text('Dashboard refreshed'),
-          backgroundColor: Theme.of(context).colorScheme.primary,
-        ),
-      );
-    }
   }
 }

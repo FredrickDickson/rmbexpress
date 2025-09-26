@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_animate/flutter_animate.dart';
 import 'package:go_router/go_router.dart';
 import '../core/models/transaction_model.dart';
 import '../core/router/app_router.dart';
@@ -35,32 +34,18 @@ class RecentTransactions extends StatelessWidget {
                 child: const Text('View All'),
               ),
             ],
-          ).animate().fadeIn(delay: 800.ms),
+          ),
         ),
         
         const SizedBox(height: 16),
         
         if (isLoading)
-          ...List.generate(
-            3,
-            (index) => _TransactionLoadingSkeleton().animate().fadeIn(
-              delay: Duration(milliseconds: 1000 + (index * 100)),
-            ),
-          )
+          ...List.generate(3, (index) => const _TransactionLoadingSkeleton())
         else if (transactions.isEmpty)
-          _EmptyTransactions().animate().fadeIn(delay: 1000.ms)
+          const _EmptyTransactions()
         else
           ...transactions.take(5).map((transaction) {
-            final index = transactions.indexOf(transaction);
-            return _TransactionItem(
-              transaction: transaction,
-            ).animate().fadeIn(
-              delay: Duration(milliseconds: 1000 + (index * 100)),
-            ).slideX(
-              begin: index.isEven ? -0.3 : 0.3,
-              duration: 500.ms,
-              curve: Curves.easeOutCubic,
-            );
+            return _TransactionItem(transaction: transaction);
           }).toList(),
       ],
     );
@@ -74,8 +59,8 @@ class _TransactionItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 4),
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 24, vertical: 4),
       child: Card(
         child: ListTile(
           leading: Container(
@@ -90,43 +75,42 @@ class _TransactionItem extends StatelessWidget {
               size: 20,
             ),
           ),
-          
           title: Text(
-            _getTransactionTitle(),
-            style: const TextStyle(fontWeight: FontWeight.w500),
+            transaction.description ?? 'Transaction',
+            style: const TextStyle(fontWeight: FontWeight.w600),
           ),
-          
-          subtitle: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              if (transaction.recipient != null)
-                Text('To: ${transaction.recipient}')
-              else if (transaction.description != null)
-                Text(transaction.description!),
-              Text(
-                _formatDate(transaction.date),
-                style: TextStyle(
-                  fontSize: 12,
-                  color: Theme.of(context).textTheme.bodySmall?.color?.withOpacity(0.6),
-                ),
-              ),
-            ],
+          subtitle: Text(
+            _formatDate(transaction.date),
+            style: Theme.of(context).textTheme.bodySmall,
           ),
-          
           trailing: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
               Text(
-                '${transaction.type == TransactionType.send ? '-' : '+'}¥${transaction.amount.toStringAsFixed(2)}',
+                '${transaction.type == TransactionType.receive ? '+' : '-'}¥${transaction.amount.toStringAsFixed(2)}',
                 style: TextStyle(
                   fontWeight: FontWeight.w600,
-                  color: transaction.type == TransactionType.send
-                      ? Colors.red
-                      : Theme.of(context).colorScheme.primary,
+                  color: transaction.type == TransactionType.receive
+                      ? Colors.green
+                      : Colors.red,
                 ),
               ),
-              _StatusChip(status: transaction.status),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                decoration: BoxDecoration(
+                  color: _getStatusColor().withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Text(
+                  _getStatusText(),
+                  style: TextStyle(
+                    fontSize: 10,
+                    color: _getStatusColor(),
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ),
             ],
           ),
         ),
@@ -134,43 +118,54 @@ class _TransactionItem extends StatelessWidget {
     );
   }
 
-  Color _getTransactionColor() {
-    switch (transaction.type) {
-      case TransactionType.buy:
-        return Colors.blue;
-      case TransactionType.send:
-        return Colors.orange;
-      case TransactionType.receive:
-        return Colors.green;
-    }
-  }
-
   IconData _getTransactionIcon() {
     switch (transaction.type) {
+      case TransactionType.receive:
+        return Icons.arrow_downward;
+      case TransactionType.send:
+        return Icons.arrow_upward;
       case TransactionType.buy:
         return Icons.currency_exchange;
-      case TransactionType.send:
-        return Icons.send;
-      case TransactionType.receive:
-        return Icons.call_received;
     }
   }
 
-  String _getTransactionTitle() {
+  Color _getTransactionColor() {
     switch (transaction.type) {
-      case TransactionType.buy:
-        return 'Currency Exchange';
-      case TransactionType.send:
-        return 'Money Sent';
       case TransactionType.receive:
-        return 'Money Received';
+        return Colors.green;
+      case TransactionType.send:
+        return Colors.red;
+      case TransactionType.buy:
+        return Colors.blue;
+    }
+  }
+
+  Color _getStatusColor() {
+    switch (transaction.status) {
+      case TransactionStatus.completed:
+        return Colors.green;
+      case TransactionStatus.pending:
+        return Colors.orange;
+      case TransactionStatus.failed:
+        return Colors.red;
+    }
+  }
+
+  String _getStatusText() {
+    switch (transaction.status) {
+      case TransactionStatus.completed:
+        return 'Completed';
+      case TransactionStatus.pending:
+        return 'Pending';
+      case TransactionStatus.failed:
+        return 'Failed';
     }
   }
 
   String _formatDate(DateTime date) {
     final now = DateTime.now();
     final difference = now.difference(date);
-    
+
     if (difference.inDays == 0) {
       return 'Today';
     } else if (difference.inDays == 1) {
@@ -183,78 +178,62 @@ class _TransactionItem extends StatelessWidget {
   }
 }
 
-class _StatusChip extends StatelessWidget {
-  final TransactionStatus status;
-
-  const _StatusChip({required this.status});
-
-  @override
-  Widget build(BuildContext context) {
-    Color color;
-    String text;
-    
-    switch (status) {
-      case TransactionStatus.completed:
-        color = Colors.green;
-        text = 'Completed';
-        break;
-      case TransactionStatus.pending:
-        color = Colors.orange;
-        text = 'Pending';
-        break;
-      case TransactionStatus.failed:
-        color = Colors.red;
-        text = 'Failed';
-        break;
-    }
-
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-      decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Text(
-        text,
-        style: TextStyle(
-          color: color,
-          fontSize: 10,
-          fontWeight: FontWeight.w500,
-        ),
-      ),
-    );
-  }
-}
-
 class _TransactionLoadingSkeleton extends StatelessWidget {
+  const _TransactionLoadingSkeleton();
+
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 4),
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 24, vertical: 4),
       child: Card(
         child: ListTile(
           leading: Container(
-            width: 36,
-            height: 36,
+            width: 40,
+            height: 40,
             decoration: BoxDecoration(
               color: Colors.grey.shade300,
               borderRadius: BorderRadius.circular(8),
             ),
           ),
           title: Container(
-            height: 16,
-            width: 120,
-            color: Colors.grey.shade300,
+            height: 14,
+            width: double.infinity,
+            decoration: BoxDecoration(
+              color: Colors.grey.shade300,
+              borderRadius: BorderRadius.circular(4),
+            ),
           ),
           subtitle: Container(
             height: 12,
-            width: 80,
-            color: Colors.grey.shade300,
+            width: 100,
+            margin: const EdgeInsets.only(top: 4),
+            decoration: BoxDecoration(
+              color: Colors.grey.shade300,
+              borderRadius: BorderRadius.circular(4),
+            ),
           ),
-          trailing: Container(
-            height: 16,
-            width: 60,
-            color: Colors.grey.shade300,
+          trailing: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              Container(
+                height: 14,
+                width: 60,
+                decoration: BoxDecoration(
+                  color: Colors.grey.shade300,
+                  borderRadius: BorderRadius.circular(4),
+                ),
+              ),
+              const SizedBox(height: 4),
+              Container(
+                height: 12,
+                width: 40,
+                decoration: BoxDecoration(
+                  color: Colors.grey.shade300,
+                  borderRadius: BorderRadius.circular(4),
+                ),
+              ),
+            ],
           ),
         ),
       ),
@@ -263,10 +242,12 @@ class _TransactionLoadingSkeleton extends StatelessWidget {
 }
 
 class _EmptyTransactions extends StatelessWidget {
+  const _EmptyTransactions();
+
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(24),
+    return Container(
+      padding: const EdgeInsets.all(32),
       child: Column(
         children: [
           Icon(
@@ -283,8 +264,8 @@ class _EmptyTransactions extends StatelessWidget {
           ),
           const SizedBox(height: 8),
           Text(
-            'Start by buying some RMB or sending money',
-            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+            'Your transaction history will appear here',
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
               color: Colors.grey.shade500,
             ),
             textAlign: TextAlign.center,

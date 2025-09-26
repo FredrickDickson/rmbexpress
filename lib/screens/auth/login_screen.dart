@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_animate/flutter_animate.dart';
 import 'package:go_router/go_router.dart';
 import '../../core/router/app_router.dart';
 
@@ -54,33 +53,22 @@ class _LoginScreenState extends State<LoginScreen> {
                                 color: Colors.white,
                                 size: 40,
                               ),
-                            ).animate().scale(
-                              duration: 600.ms,
-                              curve: Curves.elasticOut,
                             ),
                             const SizedBox(height: 24),
                             Text(
                               'BuyRMBOnline',
                               style: Theme.of(context).textTheme.displayMedium,
-                            ).animate().fadeIn(delay: 200.ms).slideY(
-                              begin: 0.3,
-                              duration: 600.ms,
-                              curve: Curves.easeOutCubic,
                             ),
                             const SizedBox(height: 8),
                             Text(
                               'Your trusted RMB exchange platform',
                               style: Theme.of(context).textTheme.bodyMedium,
                               textAlign: TextAlign.center,
-                            ).animate().fadeIn(delay: 400.ms).slideY(
-                              begin: 0.3,
-                              duration: 600.ms,
-                              curve: Curves.easeOutCubic,
                             ),
                           ],
                         ),
                         
-                        const SizedBox(height: 60),
+                        const SizedBox(height: 48),
                         
                         // Email Field
                         TextFormField(
@@ -89,17 +77,15 @@ class _LoginScreenState extends State<LoginScreen> {
                             labelText: 'Email',
                             prefixIcon: Icon(Icons.email_outlined),
                           ),
-                          keyboardType: TextInputType.emailAddress,
                           validator: (value) {
                             if (value?.isEmpty ?? true) {
-                              return 'Email is required';
+                              return 'Please enter your email';
+                            }
+                            if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(value!)) {
+                              return 'Please enter a valid email';
                             }
                             return null;
                           },
-                        ).animate().fadeIn(delay: 600.ms).slideX(
-                          begin: -0.3,
-                          duration: 600.ms,
-                          curve: Curves.easeOutCubic,
                         ),
                         
                         const SizedBox(height: 16),
@@ -113,57 +99,52 @@ class _LoginScreenState extends State<LoginScreen> {
                             prefixIcon: const Icon(Icons.lock_outlined),
                             suffixIcon: IconButton(
                               icon: Icon(
-                                _obscurePassword
-                                    ? Icons.visibility_outlined
-                                    : Icons.visibility_off_outlined,
+                                _obscurePassword ? Icons.visibility : Icons.visibility_off,
                               ),
                               onPressed: () {
-                                setState(() {
-                                  _obscurePassword = !_obscurePassword;
-                                });
+                                setState(() => _obscurePassword = !_obscurePassword);
                               },
                             ),
                           ),
                           validator: (value) {
                             if (value?.isEmpty ?? true) {
-                              return 'Password is required';
+                              return 'Please enter your password';
+                            }
+                            if (value!.length < 6) {
+                              return 'Password must be at least 6 characters';
                             }
                             return null;
                           },
-                        ).animate().fadeIn(delay: 800.ms).slideX(
-                          begin: 0.3,
-                          duration: 600.ms,
-                          curve: Curves.easeOutCubic,
                         ),
                         
                         const SizedBox(height: 24),
                         
                         // Login Button
                         SizedBox(
-                          height: 50,
+                          height: 56,
                           child: ElevatedButton(
                             onPressed: _isLoading ? null : _handleLogin,
                             child: _isLoading
-                                ? const SizedBox(
-                                    width: 20,
-                                    height: 20,
-                                    child: CircularProgressIndicator(
-                                      strokeWidth: 2,
-                                      valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                                    ),
+                                ? const Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      SizedBox(
+                                        width: 20,
+                                        height: 20,
+                                        child: CircularProgressIndicator(
+                                          strokeWidth: 2,
+                                          valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                                        ),
+                                      ),
+                                      SizedBox(width: 12),
+                                      Text('Signing in...'),
+                                    ],
                                   )
                                 : const Text(
                                     'Sign In',
-                                    style: TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.w600,
-                                    ),
+                                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
                                   ),
                           ),
-                        ).animate().fadeIn(delay: 1000.ms).slideY(
-                          begin: 0.3,
-                          duration: 600.ms,
-                          curve: Curves.easeOutCubic,
                         ),
                         
                         const SizedBox(height: 16),
@@ -171,35 +152,29 @@ class _LoginScreenState extends State<LoginScreen> {
                         // Forgot Password
                         TextButton(
                           onPressed: () {
-                            // TODO: Implement forgot password
                             ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                content: Text('Forgot password feature coming soon!'),
-                              ),
+                              const SnackBar(content: Text('Forgot password - Coming Soon!')),
                             );
                           },
                           child: const Text('Forgot Password?'),
-                        ).animate().fadeIn(delay: 1200.ms),
+                        ),
                       ],
                     ),
                   ),
                 ),
               ),
               
-              // Register Link
+              // Sign Up Link
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   const Text("Don't have an account? "),
                   TextButton(
                     onPressed: () => context.push(AppRouter.register),
-                    child: const Text(
-                      'Sign Up',
-                      style: TextStyle(fontWeight: FontWeight.w600),
-                    ),
+                    child: const Text('Sign Up'),
                   ),
                 ],
-              ).animate().fadeIn(delay: 1400.ms),
+              ),
             ],
           ),
         ),
@@ -211,15 +186,25 @@ class _LoginScreenState extends State<LoginScreen> {
     if (!_formKey.currentState!.validate()) return;
 
     setState(() => _isLoading = true);
-    
-    // Simulate API call
-    await Future.delayed(const Duration(seconds: 2));
-    
-    setState(() => _isLoading = false);
-    
-    // Mock login success - navigate to dashboard
-    if (mounted) {
-      context.go(AppRouter.dashboard);
+
+    try {
+      // Simulate API call
+      await Future.delayed(const Duration(seconds: 2));
+      
+      if (mounted) {
+        // Navigate to dashboard
+        context.go(AppRouter.dashboard);
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Login failed: $e')),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
     }
   }
 

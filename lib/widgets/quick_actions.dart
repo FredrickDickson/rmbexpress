@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_animate/flutter_animate.dart';
 import 'package:go_router/go_router.dart';
 import '../core/router/app_router.dart';
 
@@ -18,7 +17,7 @@ class QuickActions extends StatelessWidget {
             style: Theme.of(context).textTheme.headlineSmall?.copyWith(
               fontWeight: FontWeight.w600,
             ),
-          ).animate().fadeIn(delay: 400.ms),
+          ),
         ),
         
         const SizedBox(height: 16),
@@ -34,10 +33,6 @@ class QuickActions extends StatelessWidget {
                   subtitle: 'Exchange currency',
                   color: Theme.of(context).colorScheme.primary,
                   onTap: () => context.push(AppRouter.buyRmb),
-                ).animate().fadeIn(delay: 600.ms).slideX(
-                  begin: -0.3,
-                  duration: 500.ms,
-                  curve: Curves.easeOutCubic,
                 ),
               ),
               
@@ -50,10 +45,6 @@ class QuickActions extends StatelessWidget {
                   subtitle: 'Transfer RMB',
                   color: Theme.of(context).colorScheme.secondary,
                   onTap: () => context.push(AppRouter.sendMoney),
-                ).animate().fadeIn(delay: 800.ms).slideX(
-                  begin: 0.3,
-                  duration: 500.ms,
-                  curve: Curves.easeOutCubic,
                 ),
               ),
             ],
@@ -73,10 +64,6 @@ class QuickActions extends StatelessWidget {
                   subtitle: 'View transactions',
                   color: Colors.orange,
                   onTap: () => context.push(AppRouter.transactions),
-                ).animate().fadeIn(delay: 1000.ms).slideX(
-                  begin: -0.3,
-                  duration: 500.ms,
-                  curve: Curves.easeOutCubic,
                 ),
               ),
               
@@ -84,15 +71,15 @@ class QuickActions extends StatelessWidget {
               
               Expanded(
                 child: _QuickActionCard(
-                  icon: Icons.person,
-                  title: 'Profile',
-                  subtitle: 'Manage account',
+                  icon: Icons.account_balance_wallet,
+                  title: 'Wallet',
+                  subtitle: 'Manage funds',
                   color: Colors.purple,
-                  onTap: () => context.push(AppRouter.profile),
-                ).animate().fadeIn(delay: 1200.ms).slideX(
-                  begin: 0.3,
-                  duration: 500.ms,
-                  curve: Curves.easeOutCubic,
+                  onTap: () {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Wallet - Coming Soon!')),
+                    );
+                  },
                 ),
               ),
             ],
@@ -120,47 +107,53 @@ class _QuickActionCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(12),
-        child: Container(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: color.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Icon(
-                  icon,
-                  color: color,
-                  size: 24,
-                ),
-              ),
-              
-              const SizedBox(height: 12),
-              
-              Text(
-                title,
-                style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-              
-              const SizedBox(height: 4),
-              
-              Text(
-                subtitle,
-                style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  color: Theme.of(context).textTheme.bodySmall?.color?.withOpacity(0.7),
-                ),
-              ),
-            ],
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(16),
+      child: Container(
+        padding: const EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          color: color.withOpacity(0.1),
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+            color: color.withOpacity(0.2),
+            width: 1,
           ),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: color.withOpacity(0.2),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Icon(
+                icon,
+                color: color,
+                size: 24,
+              ),
+            ),
+            
+            const SizedBox(height: 12),
+            
+            Text(
+              title,
+              style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            
+            const SizedBox(height: 4),
+            
+            Text(
+              subtitle,
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                color: Theme.of(context).textTheme.bodySmall?.color?.withOpacity(0.7),
+              ),
+            ),
+          ],
         ),
       ),
     );

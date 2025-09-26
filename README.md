@@ -125,15 +125,23 @@ Based on the buy-rmb.com workflow, our app implements the complete 4-step proces
    flutter pub get
    ```
 
-3. Set up environment variables for Supabase integration:
-   ```bash
-   export SUPABASE_URL=your_supabase_url
-   export SUPABASE_ANON_KEY=your_supabase_anon_key
-   export PAYSTACK_PUBLIC_KEY=your_paystack_public_key
-   ```
+3. Configure environment variables for Supabase and Paystack integration:
+   
+   **For Replit Environment:**
+   - Environment variables are automatically configured through the Replit secrets manager
+   - The application reads from: `SUPABASE_URL`, `SUPABASE_ANON_KEY`, `PAYSTACK_PUBLIC_KEY`
+   
+   **For Local Development:**
+   - Copy `.env.example` to `.env`
+   - Update the values in `.env` with your actual keys
+   - The workflow automatically loads these variables
 
 4. Run the web application:
    ```bash
+   # In Replit - uses configured environment variables automatically
+   flutter run -d web-server --web-hostname 0.0.0.0 --web-port 5000 --release
+   
+   # For local development with environment variables
    flutter run -d web-server --web-hostname 0.0.0.0 --web-port 5000 --release \
      --dart-define=SUPABASE_URL=$SUPABASE_URL \
      --dart-define=SUPABASE_ANON_KEY=$SUPABASE_ANON_KEY \

@@ -6,6 +6,7 @@ import '../../screens/buy_rmb/buy_rmb_screen.dart';
 import '../../screens/wallet/wallet_screen.dart';
 import '../../screens/transaction_history/transaction_history_screen.dart';
 import '../../screens/profile/profile_screen.dart';
+import '../../screens/auth/user_shell.dart';
 import '../../screens/admin/admin_shell.dart';
 import '../../screens/admin/admin_dashboard_screen.dart';
 import '../../screens/admin/admin_users_screen.dart';
@@ -40,25 +41,36 @@ class AppRouter {
         path: register,
         builder: (context, state) => const RegisterScreen(),
       ),
+      // Protected user routes with UserShell authentication wrapper
       GoRoute(
         path: dashboard,
-        builder: (context, state) => const DashboardScreen(),
+        builder: (context, state) => const UserShell(
+          child: DashboardScreen(),
+        ),
       ),
       GoRoute(
         path: buyRmb,
-        builder: (context, state) => const BuyRmbScreen(),
+        builder: (context, state) => const UserShell(
+          child: BuyRmbScreen(),
+        ),
       ),
       GoRoute(
         path: wallet,
-        builder: (context, state) => const WalletScreen(),
+        builder: (context, state) => const UserShell(
+          child: WalletScreen(),
+        ),
       ),
       GoRoute(
         path: transactions,
-        builder: (context, state) => const TransactionHistoryScreen(),
+        builder: (context, state) => const UserShell(
+          child: TransactionHistoryScreen(),
+        ),
       ),
       GoRoute(
         path: profile,
-        builder: (context, state) => const ProfileScreen(),
+        builder: (context, state) => const UserShell(
+          child: ProfileScreen(),
+        ),
       ),
       
       // Admin routes with AdminShell authentication wrapper

@@ -110,6 +110,36 @@ class SupabaseService {
   /// Listen to auth state changes
   Stream<AuthState> get authStateChanges => _client.auth.onAuthStateChange;
 
+  /// Get current user's profile
+  Future<Map<String, dynamic>?> getCurrentUserProfile() async {
+    try {
+      final user = currentUser;
+      if (user == null) return null;
+
+      final profiles = await _client
+          .from('profiles')
+          .select('*')
+          .eq('user_id', user.id);
+
+      if (profiles.isEmpty) return null;
+      return profiles.first;
+    } catch (e) {
+      debugPrint('Error getting user profile: $e');
+      return null;
+    }
+  }
+
+  /// Get current user's role
+  Future<String?> getCurrentUserRole() async {
+    try {
+      final profile = await getCurrentUserProfile();
+      return profile?['role'] as String?;
+    } catch (e) {
+      debugPrint('Error getting user role: $e');
+      return null;
+    }
+  }
+
   /// Generate unique transaction reference ID
   String _generateTransactionReference() {
     final now = DateTime.now();

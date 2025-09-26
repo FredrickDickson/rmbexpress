@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_animate/flutter_animate.dart';
+// import 'package:flutter_animate/flutter_animate.dart'; // Removed due to compatibility issues
 import 'core/theme/app_theme.dart';
 import 'core/router/app_router.dart';
 
 void main() {
-  Animate.restartOnHotReload = true;
+  // Animate.restartOnHotReload = true; // Disabled due to compatibility issues
   runApp(const ProviderScope(child: BuyRMBOnlineApp()));
 }
 

@@ -27,7 +27,7 @@ outputType = "webview"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
-args = "flutter run -d web-server --web-hostname 0.0.0.0 --web-port 5000"
+args = "flutter run -d web-server --web-hostname 0.0.0.0 --web-port 5000 --release"
 waitForPort = 5000
 
 [[ports]]
@@ -35,7 +35,7 @@ localPort = 5000
 externalPort = 80
 
 [[ports]]
-localPort = 35391
+localPort = 37853
 externalPort = 3001
 
 [[ports]]

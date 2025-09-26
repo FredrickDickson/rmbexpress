@@ -245,7 +245,9 @@ class _BuyRmbScreenState extends ConsumerState<BuyRmbScreen> {
         );
         
         // Navigate back to dashboard
-        context.pop();
+        if (context.mounted) {
+          context.pop();
+        }
       }
     } catch (e) {
       // Show error
@@ -431,7 +433,7 @@ class _PaymentMethodSelector extends StatelessWidget {
                   ),
                 ),
               );
-            }).toList(),
+            }),
           ],
         ),
       ),

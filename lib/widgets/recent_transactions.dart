@@ -46,7 +46,7 @@ class RecentTransactions extends StatelessWidget {
         else
           ...transactions.take(5).map((transaction) {
             return _TransactionItem(transaction: transaction);
-          }).toList(),
+          }),
       ],
     );
   }

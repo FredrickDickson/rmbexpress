@@ -222,6 +222,8 @@ class _AmountInputState extends State<AmountInput> with TickerProviderStateMixin
 
   String _getCurrencySymbol(String currency) {
     switch (currency) {
+      case 'GHS':
+        return '₵';
       case 'USD':
         return '\$';
       case 'EUR':
@@ -279,6 +281,8 @@ class _QuickAmountButton extends StatelessWidget {
 
   String _formatAmount(double amount, String currency) {
     switch (currency) {
+      case 'GHS':
+        return '₵${amount.toStringAsFixed(0)}';
       case 'USD':
         return '\$${amount.toStringAsFixed(0)}';
       case 'EUR':

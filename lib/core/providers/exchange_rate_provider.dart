@@ -5,7 +5,7 @@ final exchangeRatesProvider = StateNotifierProvider<ExchangeRatesNotifier, Map<S
   return ExchangeRatesNotifier();
 });
 
-final selectedCurrencyProvider = StateProvider<String>((ref) => 'USD');
+final selectedCurrencyProvider = StateProvider<String>((ref) => 'GHS');
 
 class ExchangeRatesNotifier extends StateNotifier<Map<String, ExchangeRate>> {
   ExchangeRatesNotifier() : super(_mockRates) {
@@ -13,6 +13,13 @@ class ExchangeRatesNotifier extends StateNotifier<Map<String, ExchangeRate>> {
   }
 
   static final _mockRates = {
+    'GHS': ExchangeRate(
+      fromCurrency: 'GHS',
+      toCurrency: 'RMB',
+      rate: 0.58,
+      lastUpdated: DateTime.now(),
+      changePercent: 0.12,
+    ),
     'USD': ExchangeRate(
       fromCurrency: 'USD',
       toCurrency: 'RMB',

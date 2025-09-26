@@ -357,7 +357,7 @@ class _PaymentMethodSelector extends StatelessWidget {
     final methods = [
       {'id': 'card', 'name': 'Credit/Debit Card', 'icon': Icons.credit_card},
       {'id': 'bank', 'name': 'Bank Transfer', 'icon': Icons.account_balance},
-      {'id': 'wallet', 'name': 'Digital Wallet', 'icon': Icons.wallet},
+      {'id': 'wallet', 'name': 'DIGITAL WALLET OR MOMO', 'icon': Icons.wallet},
     ];
 
     return Card(
@@ -508,6 +508,7 @@ class _TransactionSummary extends StatelessWidget {
 
   String _getCurrencySymbol(String currency) {
     switch (currency) {
+      case 'GHS': return '₵';
       case 'USD': return '\$';
       case 'EUR': return '€';
       case 'GBP': return '£';
@@ -520,7 +521,7 @@ class _TransactionSummary extends StatelessWidget {
     switch (method) {
       case 'card': return 'Credit/Debit Card';
       case 'bank': return 'Bank Transfer';
-      case 'wallet': return 'Digital Wallet';
+      case 'wallet': return 'DIGITAL WALLET OR MOMO';
       default: return method;
     }
   }

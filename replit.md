@@ -21,11 +21,13 @@ This is a Flutter web application called "BuyRMBOnline" that has been successful
 - Command: `flutter run -d web-server --web-hostname 0.0.0.0 --web-port 5000`
 - Hot reload enabled for development
 
-## Recent Changes (Sep 19, 2025)
-- Set up complete Flutter project from GitHub import
-- Configured web server to bind to all hosts (0.0.0.0:5000) for Replit proxy compatibility
-- Updated app title from "Flutter Demo" to "BuyRMBOnline"
-- Successfully tested server accessibility
+## Recent Changes (Sep 26, 2025)
+- **Security Enhancement**: Fixed critical Supabase integration vulnerabilities by implementing authentication-based user ID derivation, preventing horizontal privilege escalation
+- **Unified Authentication**: Completely migrated to Supabase-only authentication, removed GoogleAuthService dependency and google_sign_in package
+- **Secure Configuration**: Updated workflow to use environment variables properly (SUPABASE_URL, SUPABASE_ANON_KEY, PAYSTACK_PUBLIC_KEY only - secret keys secured server-side)
+- **Professional Branding**: Enhanced app with generated logo, improved typography, and cohesive brand identity throughout the app
+- **Database Integration**: Implemented secure Supabase service with proper user scoping and server-side timestamp handling
+- **Error Resolution**: Fixed JSON parsing errors and improved application stability
 
 ## User Preferences
 - No specific user preferences recorded yet

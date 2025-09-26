@@ -3,7 +3,7 @@ import '../../screens/auth/login_screen.dart';
 import '../../screens/auth/register_screen.dart';
 import '../../screens/dashboard/dashboard_screen.dart';
 import '../../screens/buy_rmb/buy_rmb_screen.dart';
-import '../../screens/send_money/send_money_screen.dart';
+import '../../screens/wallet/wallet_screen.dart';
 import '../../screens/transaction_history/transaction_history_screen.dart';
 import '../../screens/profile/profile_screen.dart';
 
@@ -12,7 +12,7 @@ class AppRouter {
   static const String register = '/register';
   static const String dashboard = '/dashboard';
   static const String buyRmb = '/buy-rmb';
-  static const String sendMoney = '/send-money';
+  static const String wallet = '/wallet';
   static const String transactions = '/transactions';
   static const String profile = '/profile';
 
@@ -36,8 +36,8 @@ class AppRouter {
         builder: (context, state) => const BuyRmbScreen(),
       ),
       GoRoute(
-        path: sendMoney,
-        builder: (context, state) => const SendMoneyScreen(),
+        path: wallet,
+        builder: (context, state) => const WalletScreen(),
       ),
       GoRoute(
         path: transactions,

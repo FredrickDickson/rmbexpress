@@ -40,11 +40,11 @@ class QuickActions extends StatelessWidget {
               
               Expanded(
                 child: _QuickActionCard(
-                  icon: Icons.send,
-                  title: 'Send Money',
-                  subtitle: 'Transfer RMB',
+                  icon: Icons.account_balance_wallet,
+                  title: 'Wallet',
+                  subtitle: 'Manage funds',
                   color: Theme.of(context).colorScheme.secondary,
-                  onTap: () => context.push(AppRouter.sendMoney),
+                  onTap: () => context.push(AppRouter.wallet),
                 ),
               ),
             ],
@@ -71,15 +71,11 @@ class QuickActions extends StatelessWidget {
               
               Expanded(
                 child: _QuickActionCard(
-                  icon: Icons.account_balance_wallet,
-                  title: 'Wallet',
-                  subtitle: 'Manage funds',
+                  icon: Icons.settings,
+                  title: 'Settings',
+                  subtitle: 'App preferences',
                   color: Colors.purple,
-                  onTap: () {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Wallet - Coming Soon!')),
-                    );
-                  },
+                  onTap: () => context.push(AppRouter.profile),
                 ),
               ),
             ],

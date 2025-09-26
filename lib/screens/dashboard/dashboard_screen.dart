@@ -21,12 +21,18 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
   @override
   void initState() {
     super.initState();
-    _simulateLoading();
+    _loadDashboardData();
   }
 
-  Future<void> _simulateLoading() async {
-    // Simulate initial data loading
-    await Future.delayed(const Duration(seconds: 2));
+  Future<void> _loadDashboardData() async {
+    setState(() => _isLoading = true);
+    
+    // Refresh user data from Supabase
+    await ref.read(userProvider.notifier).refreshUserData();
+    
+    // Small delay for smooth UX
+    await Future.delayed(const Duration(milliseconds: 500));
+    
     if (mounted) {
       setState(() => _isLoading = false);
     }
@@ -76,11 +82,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
       ),
       
       body: RefreshIndicator(
-        onRefresh: () async {
-          setState(() => _isLoading = true);
-          await _simulateLoading();
-          // Refresh transactions - provider will automatically update
-        },
+        onRefresh: _loadDashboardData,
         child: SingleChildScrollView(
           physics: const AlwaysScrollableScrollPhysics(),
           child: Column(

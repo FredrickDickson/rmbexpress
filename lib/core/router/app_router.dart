@@ -6,12 +6,12 @@ import '../../screens/buy_rmb/buy_rmb_screen.dart';
 import '../../screens/wallet/wallet_screen.dart';
 import '../../screens/transaction_history/transaction_history_screen.dart';
 import '../../screens/profile/profile_screen.dart';
+import '../../screens/admin/admin_shell.dart';
 import '../../screens/admin/admin_dashboard_screen.dart';
 import '../../screens/admin/admin_users_screen.dart';
 import '../../screens/admin/admin_transactions_screen.dart';
 import '../../screens/admin/admin_config_screen.dart';
 import '../../screens/admin/admin_reports_screen.dart';
-import '../services/admin_service.dart';
 
 class AppRouter {
   static const String login = '/login';
@@ -61,41 +61,38 @@ class AppRouter {
         builder: (context, state) => const ProfileScreen(),
       ),
       
-      // Admin routes with role guard
+      // Admin routes with AdminShell authentication wrapper
       GoRoute(
         path: adminDashboard,
-        builder: (context, state) => const AdminDashboardScreen(),
-        redirect: (context, state) => _adminGuard(),
+        builder: (context, state) => const AdminShell(
+          child: AdminDashboardScreen(),
+        ),
       ),
       GoRoute(
         path: adminUsers,
-        builder: (context, state) => const AdminUsersScreen(),
-        redirect: (context, state) => _adminGuard(),
+        builder: (context, state) => const AdminShell(
+          child: AdminUsersScreen(),
+        ),
       ),
       GoRoute(
         path: adminTransactions,
-        builder: (context, state) => const AdminTransactionsScreen(),
-        redirect: (context, state) => _adminGuard(),
+        builder: (context, state) => const AdminShell(
+          child: AdminTransactionsScreen(),
+        ),
       ),
       GoRoute(
         path: adminConfig,
-        builder: (context, state) => const AdminConfigScreen(),
-        redirect: (context, state) => _adminGuard(),
+        builder: (context, state) => const AdminShell(
+          child: AdminConfigScreen(),
+        ),
       ),
       GoRoute(
         path: adminReports,
-        builder: (context, state) => const AdminReportsScreen(),
-        redirect: (context, state) => _adminGuard(),
+        builder: (context, state) => const AdminShell(
+          child: AdminReportsScreen(),
+        ),
       ),
     ],
   );
 
-  // Admin route guard
-  static String? _adminGuard() {
-    final adminService = AdminService();
-    
-    // This is a simple check - in a real app you might want to cache this
-    // For now, we'll check on each navigation
-    return null; // Allow navigation, check will be done in the screen
-  }
 }

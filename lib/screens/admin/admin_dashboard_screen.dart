@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import '../../core/services/admin_service.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/router/app_router.dart';
+import 'admin_shell.dart';
 
 class AdminDashboardScreen extends StatefulWidget {
   const AdminDashboardScreen({super.key});
@@ -15,58 +16,31 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
   final _adminService = AdminService();
   
   bool _isLoading = true;
-  bool _isAuthorized = false;
   Map<String, dynamic> _analytics = {};
-  Map<String, dynamic>? _adminProfile;
-
+  
   @override
   void initState() {
     super.initState();
-    _checkAuthAndLoadData();
+    _loadAnalytics();
   }
 
-  Future<void> _checkAuthAndLoadData() async {
+  Future<void> _loadAnalytics() async {
     try {
       setState(() => _isLoading = true);
       
-      // Check if user is admin
-      final isAdmin = await _adminService.isCurrentUserAdmin();
-      if (!isAdmin) {
-        _redirectToDashboard();
-        return;
-      }
-      
-      // Get admin profile
-      final adminProfile = await _adminService.getCurrentAdminProfile();
-      if (adminProfile == null) {
-        _redirectToDashboard();
-        return;
-      }
-
-      // Load analytics data
+      // Load analytics data - auth is already handled by AdminShell
       final analytics = await _adminService.getDashboardAnalytics();
 
       setState(() {
-        _isAuthorized = true;
-        _adminProfile = adminProfile;
         _analytics = analytics;
       });
     } catch (e) {
       _showErrorSnackBar('Failed to load admin dashboard: ${e.toString()}');
-      _redirectToDashboard();
     } finally {
       if (mounted) {
         setState(() => _isLoading = false);
       }
     }
-  }
-
-  void _redirectToDashboard() {
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (mounted) {
-        context.go(AppRouter.dashboard);
-      }
-    });
   }
 
   void _showErrorSnackBar(String message) {
@@ -82,46 +56,12 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final adminAuth = AdminAuthProvider.of(context);
+    final adminProfile = adminAuth.adminProfile;
+
     if (_isLoading) {
       return const Scaffold(
         body: Center(child: CircularProgressIndicator()),
-      );
-    }
-
-    if (!_isAuthorized) {
-      return Scaffold(
-        body: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(
-                Icons.security,
-                size: 64,
-                color: AppTheme.errorColor,
-              ),
-              const SizedBox(height: 16),
-              Text(
-                'Access Denied',
-                style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                  color: AppTheme.errorColor,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                'You do not have admin privileges',
-                style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                  color: AppTheme.textSecondary,
-                ),
-              ),
-              const SizedBox(height: 24),
-              ElevatedButton(
-                onPressed: () => context.go(AppRouter.dashboard),
-                child: const Text('Go to Dashboard'),
-              ),
-            ],
-          ),
-        ),
       );
     }
 
@@ -131,7 +71,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh),
-            onPressed: _checkAuthAndLoadData,
+            onPressed: _loadAnalytics,
           ),
           PopupMenuButton<String>(
             onSelected: (value) {
@@ -170,7 +110,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
         ],
       ),
       body: RefreshIndicator(
-        onRefresh: _checkAuthAndLoadData,
+        onRefresh: _loadAnalytics,
         child: SingleChildScrollView(
           physics: const AlwaysScrollableScrollPhysics(),
           padding: const EdgeInsets.all(16),
@@ -178,7 +118,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // Welcome Section
-              _buildWelcomeSection(),
+              _buildWelcomeSection(adminProfile),
               
               const SizedBox(height: 24),
               
@@ -201,9 +141,9 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
     );
   }
 
-  Widget _buildWelcomeSection() {
-    final adminName = _adminProfile?['full_name'] as String? ?? 'Admin';
-    final role = _adminProfile?['role'] as String? ?? 'admin';
+  Widget _buildWelcomeSection(Map<String, dynamic> adminProfile) {
+    final adminName = adminProfile['full_name'] as String? ?? 'Admin';
+    final role = adminProfile['role'] as String? ?? 'admin';
 
     return Card(
       child: Padding(

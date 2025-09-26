@@ -27,24 +27,12 @@ outputType = "webview"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
-args = "flutter run -d web-server --web-hostname 0.0.0.0 --web-port 5000 --release"
+args = "flutter run -d web-server --web-hostname 0.0.0.0 --web-port 5000 --release --dart-define=SUPABASE_URL=$SUPABASE_URL --dart-define=SUPABASE_ANON_KEY=$SUPABASE_ANON_KEY --dart-define=PAYSTACK_PUBLIC_KEY=$PAYSTACK_PUBLIC_KEY"
 waitForPort = 5000
 
 [[ports]]
 localPort = 5000
 externalPort = 80
-
-[[ports]]
-localPort = 32867
-externalPort = 3002
-
-[[ports]]
-localPort = 37853
-externalPort = 3001
-
-[[ports]]
-localPort = 37885
-externalPort = 3000
 
 [deployment]
 deploymentTarget = "autoscale"

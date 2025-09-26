@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../core/router/app_router.dart';
-import '../../core/services/google_auth_service.dart';
+import '../../core/services/supabase_service.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -38,32 +39,89 @@ class _LoginScreenState extends State<LoginScreen> {
                         Column(
                           children: [
                             Container(
-                              width: 80,
-                              height: 80,
+                              width: 120,
+                              height: 120,
                               decoration: BoxDecoration(
-                                gradient: LinearGradient(
-                                  colors: [
-                                    Theme.of(context).colorScheme.primary,
-                                    Theme.of(context).colorScheme.secondary,
-                                  ],
-                                ),
                                 shape: BoxShape.circle,
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Theme.of(context).colorScheme.primary.withOpacity(0.3),
+                                    blurRadius: 20,
+                                    offset: const Offset(0, 8),
+                                  ),
+                                ],
                               ),
-                              child: const Icon(
-                                Icons.currency_exchange,
-                                color: Colors.white,
-                                size: 40,
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(60),
+                                child: Image.asset(
+                                  'assets/images/app_logo.png',
+                                  width: 120,
+                                  height: 120,
+                                  fit: BoxFit.cover,
+                                  errorBuilder: (context, error, stackTrace) {
+                                    return Container(
+                                      width: 120,
+                                      height: 120,
+                                      decoration: BoxDecoration(
+                                        gradient: LinearGradient(
+                                          colors: [
+                                            Theme.of(context).colorScheme.primary,
+                                            Theme.of(context).colorScheme.secondary,
+                                          ],
+                                        ),
+                                        shape: BoxShape.circle,
+                                      ),
+                                      child: const Icon(
+                                        Icons.currency_exchange,
+                                        color: Colors.white,
+                                        size: 50,
+                                      ),
+                                    );
+                                  },
+                                ),
                               ),
                             ),
                             const SizedBox(height: 24),
-                            Text(
-                              'BuyRMBOnline',
-                              style: Theme.of(context).textTheme.displayMedium,
+                            RichText(
+                              text: TextSpan(
+                                children: [
+                                  TextSpan(
+                                    text: 'Buy',
+                                    style: Theme.of(context).textTheme.displaySmall?.copyWith(
+                                      fontWeight: FontWeight.w700,
+                                      color: Theme.of(context).colorScheme.primary,
+                                    ),
+                                  ),
+                                  TextSpan(
+                                    text: 'RMB',
+                                    style: Theme.of(context).textTheme.displaySmall?.copyWith(
+                                      fontWeight: FontWeight.w400,
+                                      color: Colors.red.shade600,
+                                    ),
+                                  ),
+                                  TextSpan(
+                                    text: 'Online',
+                                    style: Theme.of(context).textTheme.displaySmall?.copyWith(
+                                      fontWeight: FontWeight.w300,
+                                      color: Theme.of(context).colorScheme.onSurface,
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
                             const SizedBox(height: 8),
                             Text(
-                              'Your trusted RMB exchange platform',
-                              style: Theme.of(context).textTheme.bodyMedium,
+                              '🇬🇭 Ghana\'s #1 RMB Exchange Platform 🇨🇳',
+                              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                fontWeight: FontWeight.w500,
+                                color: Theme.of(context).colorScheme.primary,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              'Fast • Secure • Trusted',
+                              style: Theme.of(context).textTheme.bodySmall,
                               textAlign: TextAlign.center,
                             ),
                           ],
@@ -245,17 +303,41 @@ class _LoginScreenState extends State<LoginScreen> {
     setState(() => _isLoading = true);
 
     try {
-      // Simulate API call
-      await Future.delayed(const Duration(seconds: 2));
+      final response = await SupabaseService().signIn(
+        email: _emailController.text.trim(),
+        password: _passwordController.text,
+      );
       
-      if (mounted) {
-        // Navigate to dashboard
+      if (response.user != null && mounted) {
+        // Create or update user profile
+        await SupabaseService().createOrUpdateProfile(
+          fullName: response.user!.userMetadata?['full_name'] ?? response.user!.email?.split('@')[0],
+        );
+        
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Welcome back, ${response.user!.email}!'),
+            backgroundColor: Colors.green,
+          ),
+        );
         context.go(AppRouter.dashboard);
+      }
+    } on AuthException catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(e.message),
+            backgroundColor: Colors.red,
+          ),
+        );
       }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Login failed: $e')),
+          SnackBar(
+            content: Text('Login failed: $e'),
+            backgroundColor: Colors.red,
+          ),
         );
       }
     } finally {
@@ -269,28 +351,16 @@ class _LoginScreenState extends State<LoginScreen> {
     setState(() => _isLoading = true);
 
     try {
-      final GoogleUser? user = await GoogleAuthService().signIn();
+      // Use Supabase Google OAuth - this will redirect to Google on web
+      await SupabaseService().signInWithGoogle();
       
-      if (user != null && mounted) {
-        // Show success message
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Welcome, ${user.displayName}!'),
-            backgroundColor: Colors.green,
-          ),
-        );
-        
-        // Navigate to dashboard
-        context.go(AppRouter.dashboard);
-      } else if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Google sign-in was cancelled'),
-          ),
-        );
-      }
+      // Note: On web, this will redirect to Google OAuth
+      // The user will return to the app after successful authentication
+      // and the auth state change will be handled by the router
+      
     } catch (e) {
       if (mounted) {
+        setState(() => _isLoading = false);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Google sign-in failed: $e'),
@@ -298,11 +368,9 @@ class _LoginScreenState extends State<LoginScreen> {
           ),
         );
       }
-    } finally {
-      if (mounted) {
-        setState(() => _isLoading = false);
-      }
     }
+    // Note: We don't reset _isLoading here for successful case since
+    // the page will redirect for OAuth flow
   }
 
   @override

@@ -110,6 +110,15 @@ class SupabaseService {
   /// Listen to auth state changes
   Stream<AuthState> get authStateChanges => _client.auth.onAuthStateChange;
 
+  /// Generate unique transaction reference ID
+  String _generateTransactionReference() {
+    final now = DateTime.now();
+    final dateStr = '${now.year}${now.month.toString().padLeft(2, '0')}${now.day.toString().padLeft(2, '0')}';
+    final timeStr = '${now.hour.toString().padLeft(2, '0')}${now.minute.toString().padLeft(2, '0')}${now.second.toString().padLeft(2, '0')}';
+    final random = (DateTime.now().millisecondsSinceEpoch % 10000).toString().padLeft(4, '0');
+    return 'TXN$dateStr$timeStr$random';
+  }
+
   /// Create a new transaction record (uses authenticated user)
   Future<Map<String, dynamic>?> createTransaction({
     required double amount,
@@ -118,6 +127,8 @@ class SupabaseService {
     required double exchangeRate,
     required String status,
     String? paymentMethod,
+    Map<String, dynamic>? recipientDetails,
+    String? paystackReference,
   }) async {
     final user = currentUser;
     if (user == null) {
@@ -125,6 +136,8 @@ class SupabaseService {
     }
 
     try {
+      final referenceId = _generateTransactionReference();
+      
       final response = await _client
           .from('transactions')
           .insert({
@@ -135,6 +148,9 @@ class SupabaseService {
             'exchange_rate': exchangeRate,
             'status': status,
             'payment_method': paymentMethod,
+            'reference_id': referenceId,
+            if (recipientDetails != null) 'recipient_details': recipientDetails,
+            if (paystackReference != null) 'paystack_reference': paystackReference,
             // Remove client-side timestamp, let DB handle it
           })
           .select()

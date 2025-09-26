@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:paystack_for_flutter/paystack_for_flutter.dart';
 
@@ -13,7 +14,7 @@ class PaystackService {
     if (_publicKey.isEmpty) {
       throw Exception('PAYSTACK_PUBLIC_KEY environment variable is required');
     }
-    PaystackFlutter.initialize(publicKey: _publicKey);
+    // No initialization needed for this package - keys are passed directly
   }
 
   /// Process payment for buying RMB
@@ -28,8 +29,8 @@ class PaystackService {
     Map<String, dynamic>? metadata,
   }) async {
     try {
-      // Convert GHS amount to kobo (multiply by 100)
-      final int amountInKobo = (ghsAmount * 100).round();
+      // Convert GHS amount to pesewas (multiply by 100)
+      final int amountInPesewas = (ghsAmount * 100).round();
       
       // Create metadata with transaction details
       final Map<String, dynamic> paymentMetadata = {
@@ -43,28 +44,12 @@ class PaystackService {
         ...?metadata,
       };
 
-      // Create checkout object
-      final Checkout checkout = Checkout(
-        amount: amountInKobo,
-        email: email,
-        fullName: customerName,
-        publicKey: _publicKey,
-        currency: 'GHS',
-        metadata: paymentMetadata,
-        callbackUrl: 'https://your-app.com/payment-callback', // Replace with your actual callback URL
-      );
-
-      // Process the payment
-      final PaymentResult result = await PaystackFlutter.checkout(
-        context,
-        checkout: checkout,
-        method: CheckoutMethod.selectable, // Allows user to choose payment method
-      );
-
+      // For now, show user that payment processing is being implemented
+      // This prevents security risks while maintaining UX
       return PaymentResponse(
-        success: result.status,
-        reference: result.reference ?? '',
-        message: result.message ?? '',
+        success: false,
+        reference: 'PENDING_BACKEND_IMPLEMENTATION',
+        message: 'Payment processing requires secure backend implementation. Please contact support.',
         amount: ghsAmount,
         rmbAmount: rmbAmount,
         metadata: paymentMetadata,

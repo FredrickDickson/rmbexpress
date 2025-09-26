@@ -3,7 +3,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 // import 'package:flutter_animate/flutter_animate.dart';
 import 'package:go_router/go_router.dart';
 import '../../core/providers/exchange_rate_provider.dart';
+import '../../core/providers/user_provider.dart';
 import '../../core/models/exchange_rate_model.dart';
+import '../../core/services/paystack_service.dart';
+import '../../core/services/supabase_service.dart';
 import '../../widgets/currency_selector.dart';
 import '../../widgets/amount_input.dart';
 
@@ -245,25 +248,60 @@ class _BuyRmbScreenState extends ConsumerState<BuyRmbScreen> {
     setState(() => _isProcessing = true);
     
     try {
-      // Simulate payment processing
-      await Future.delayed(const Duration(seconds: 3));
+      // Get current user information
+      final user = SupabaseService().currentUser;
+      if (user == null) {
+        throw Exception('User not authenticated');
+      }
       
+      // Get user profile for additional details
+      final userProfile = await SupabaseService().getUserProfile();
+      final customerName = userProfile?['full_name'] ?? user.email ?? 'Customer';
+      
+      // Calculate RMB amount
+      final exchangeRate = ref.read(exchangeRatesProvider)[ref.read(selectedCurrencyProvider)];
+      final rmbAmount = _amount * (exchangeRate?.rate ?? 1);
+      
+      // Process payment with Paystack
+      final paymentResponse = await PaystackService().processBuyRmbPayment(
+        context: context,
+        email: user.email ?? '',
+        ghsAmount: _amount,
+        rmbAmount: rmbAmount,
+        currency: ref.read(selectedCurrencyProvider),
+        customerName: customerName,
+        metadata: {
+          'user_id': user.id,
+          'exchange_rate': exchangeRate?.rate,
+          'payment_timestamp': DateTime.now().toIso8601String(),
+        },
+      );
+      
+      // Show message about payment implementation status
       if (mounted) {
-        // Show success dialog
         await showDialog<void>(
           context: context,
           barrierDismissible: false,
-          builder: (context) => _SuccessDialog(
-            amount: _amount,
-            currency: ref.read(selectedCurrencyProvider),
-            rmbAmount: _amount * (ref.read(exchangeRatesProvider)[ref.read(selectedCurrencyProvider)]?.rate ?? 1),
+          builder: (context) => AlertDialog(
+            title: const Text('Payment Implementation Notice'),
+            content: const Text(
+              'Real payment processing requires a secure backend implementation to protect your financial data. '
+              'Currently showing simulated flow for demonstration. '
+              'Contact support to enable live payments with proper security.',
+            ),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                  if (context.mounted) {
+                    context.pop();
+                  }
+                },
+                child: const Text('Understood'),
+              ),
+            ],
           ),
         );
-        
-        // Navigate back to dashboard
-        if (context.mounted) {
-          context.pop();
-        }
       }
     } catch (e) {
       // Show error

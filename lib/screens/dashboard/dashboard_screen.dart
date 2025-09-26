@@ -50,7 +50,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
 
     return Scaffold(
       appBar: RoleBasedAppBar(
-        title: 'Welcome back, ${user.name.split(' ').first}',
+        title: 'Welcome back, ${_getFirstName(user.name)}',
         actions: [
           IconButton(
             icon: const Icon(Icons.notifications_outlined),
@@ -119,6 +119,14 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
         child: const Icon(Icons.currency_exchange),
       ),
     );
+  }
+
+  String _getFirstName(String fullName) {
+    if (fullName.isEmpty || fullName == 'Loading...') {
+      return 'User';
+    }
+    final parts = fullName.split(' ');
+    return parts.isNotEmpty ? parts.first : 'User';
   }
 
   Widget _buildAdminQuickAccess(BuildContext context) {

@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/user_model.dart';
 import '../services/supabase_service.dart';
@@ -51,7 +52,7 @@ class UserNotifier extends StateNotifier<User> {
       );
     } catch (e) {
       // Keep default state if loading fails
-      print('Failed to load user data: $e');
+      debugPrint('Failed to load user data: $e');
     }
   }
 
@@ -60,13 +61,16 @@ class UserNotifier extends StateNotifier<User> {
     final parts = email.split('@');
     if (parts.isEmpty) return 'User';
     final localPart = parts.first;
+    if (localPart.isEmpty) return 'User';
+    
     // Convert email like john.doe to John Doe
     final nameParts = localPart.split('.');
-    return nameParts
-        .map((part) => part.isNotEmpty 
-            ? '${part[0].toUpperCase()}${part.substring(1)}' 
-            : '')
-        .join(' ');
+    final processedParts = nameParts
+        .where((part) => part.isNotEmpty)
+        .map((part) => '${part[0].toUpperCase()}${part.substring(1)}')
+        .toList();
+    
+    return processedParts.isNotEmpty ? processedParts.join(' ') : 'User';
   }
 
   Future<void> refreshUserData() async {

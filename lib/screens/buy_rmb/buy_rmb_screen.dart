@@ -27,8 +27,24 @@ class _BuyRmbScreenState extends ConsumerState<BuyRmbScreen> {
     final currentRate = exchangeRates[selectedCurrency];
     
     if (currentRate == null) {
-      return const Scaffold(
-        body: Center(child: CircularProgressIndicator()),
+      return Scaffold(
+        appBar: AppBar(
+          title: const Text('Buy RMB'),
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back),
+            onPressed: () => context.pop(),
+          ),
+        ),
+        body: const Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              CircularProgressIndicator(),
+              SizedBox(height: 16),
+              Text('Loading exchange rates...'),
+            ],
+          ),
+        ),
       );
     }
 

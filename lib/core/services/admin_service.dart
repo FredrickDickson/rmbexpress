@@ -1,9 +1,9 @@
+import 'package:flutter/foundation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'supabase_service.dart';
 
 class AdminService {
   final _supabase = Supabase.instance.client;
-  final _supabaseService = SupabaseService();
 
   // Check if current user has admin role
   Future<bool> isCurrentUserAdmin() async {
@@ -21,7 +21,7 @@ class AdminService {
       final role = profiles.first['role'] as String?;
       return role == 'admin' || role == 'super_admin';
     } catch (e) {
-      print('Error checking admin role: $e');
+      debugPrint('Error checking admin role: $e');
       return false;
     }
   }
@@ -47,7 +47,7 @@ class AdminService {
 
       return profile;
     } catch (e) {
-      print('Error getting admin profile: $e');
+      debugPrint('Error getting admin profile: $e');
       return null;
     }
   }

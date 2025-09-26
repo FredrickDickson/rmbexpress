@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/transaction_model.dart';
 import '../services/supabase_service.dart';
@@ -27,7 +28,7 @@ class TransactionsNotifier extends StateNotifier<List<Transaction>> {
       
       state = convertedTransactions;
     } catch (e) {
-      print('Failed to load transactions: $e');
+      debugPrint('Failed to load transactions: $e');
       state = [];
     }
   }

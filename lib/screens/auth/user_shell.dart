@@ -5,6 +5,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../core/services/supabase_service.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/router/app_router.dart';
+import '../../widgets/bottom_navigation_shell.dart';
 
 /// UserShell provides authentication wrapper for all user screens
 /// This ensures that only authenticated users can access user functionality
@@ -107,8 +108,10 @@ class _UserShellState extends State<UserShell> {
       return _buildRedirectScreen();
     }
 
-    // User is authenticated - show the requested content
-    return widget.child;
+    // User is authenticated - show the requested content with bottom navigation
+    return BottomNavigationShell(
+      child: widget.child,
+    );
   }
 
   Widget _buildLoadingScreen() {

@@ -12,7 +12,7 @@ class WalletScreen extends ConsumerStatefulWidget {
   ConsumerState<WalletScreen> createState() => _WalletScreenState();
 }
 
-class _WalletScreenState extends ConsumerState<WalletScreen> with SingleTickerProviderStateMixin {
+class _WalletScreenState extends ConsumerState<WalletScreen> with TickerProviderStateMixin {
   final _supabaseService = SupabaseService();
   
   bool _isLoading = true;

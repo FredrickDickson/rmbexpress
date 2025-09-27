@@ -1,4 +1,5 @@
 import 'package:go_router/go_router.dart';
+import '../../widgets/splash_screen.dart';
 import '../../screens/auth/login_screen.dart';
 import '../../screens/auth/register_screen.dart';
 import '../../screens/dashboard/dashboard_screen.dart';
@@ -15,6 +16,7 @@ import '../../screens/admin/admin_config_screen.dart';
 import '../../screens/admin/admin_reports_screen.dart';
 
 class AppRouter {
+  static const String splash = '/';
   static const String login = '/login';
   static const String register = '/register';
   static const String dashboard = '/dashboard';
@@ -31,8 +33,12 @@ class AppRouter {
   static const String adminReports = '/admin/reports';
 
   static final GoRouter router = GoRouter(
-    initialLocation: login,
+    initialLocation: splash,
     routes: [
+      GoRoute(
+        path: splash,
+        builder: (context, state) => const SplashScreen(),
+      ),
       GoRoute(
         path: login,
         builder: (context, state) => const LoginScreen(),

@@ -292,12 +292,6 @@ Please report bugs by creating an issue in the GitHub repository with:
 - **Issues**: Report bugs and feature requests via GitHub Issues
 - **Discussions**: Use GitHub Discussions for questions and ideas
 
-### Service Information
-Inspired by buy-rmb.com service:
-- **Phone**: +233 508 341 200
-- **Email**: info@buy-rmb.com  
-- **Live Chat**: 6 AM – 4 PM GMT
-- **Website**: [https://buy-rmb.com](https://buy-rmb.com)
 
 ## 📄 License
 
@@ -305,7 +299,7 @@ This project is developed for educational and demonstration purposes. Please ens
 
 ---
 
-**Last Updated**: September 26, 2025  
+**Last Updated**: September 30, 2025  
 **Version**: 1.3.0-beta  
 **Flutter Version**: 3.32.0  
 **Supabase Integration**: ✅ Complete  

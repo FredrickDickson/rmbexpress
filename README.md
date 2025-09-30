@@ -1,6 +1,6 @@
 # BuyRMBOnline - Flutter Fintech App
 
-A comprehensive Flutter web application for buying and sending Chinese Renminbi (RMB) online, inspired by the buy-rmb.com service. This fintech platform enables users in Ghana and other countries to exchange their local currency (primarily Ghana Cedi - GHS) for RMB and transfer funds to China via WeChat, Alipay, or Chinese bank accounts.
+A comprehensive Flutter web application for buying and sending Chinese Renminbi (RMB) online. This fintech platform enables users in Ghana and other countries to exchange their local currency (primarily Ghana Cedi - GHS) for RMB and transfer funds to China via WeChat, Alipay, or Chinese bank accounts.
 
 ## 🚀 Features
 
